@@ -17,11 +17,16 @@ const ScoreList = () => {
     const data = localStorage.getItem("list")
     setList(JSON.parse(data))
   }, [])
+
+  const toHomepage = () => {
+   window.location.href="/homepage"
+  }
   
   return (
     <>
       <Navbar/>
-      <div className="cont h-[calc(100vh-60px)] flex justify-center items-center ">
+      <div className="cont h-[calc(100vh-60px)] flex relative justify-center items-center ">
+        <div className="home p-[5px] rounded-[3px] uppercase font-bold bg-white absolute top-[10px] left-[10px] border hover: border-opacity-[50%] flex justify-center items-center shadow cursor-pointer" onClick={toHomepage}>Back to homepage</div>
 
         <div className="innerCont h-[80vh] w-[50vw]  shadow1 flex flex-col justify-between p-[10px]"> 
           <div className="currentScore w-full h-[40%] bg-red-50 p-[10px] flex flex-col items-center">

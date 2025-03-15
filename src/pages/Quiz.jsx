@@ -7,10 +7,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Quiz = () => {
-  const [questions] = useState([
-    { Question: "What is 2+2", options: [3, 5, 6, 4], ans: 4 },
-    { Question: "What is 2+3", options: [3, 5, 6, 4], ans: 5 },
-  ]);
   const navigate = useNavigate();
   const [timerStopReturn, setTimerStopReturn] = useState(false);
   const [submit, setSubmit] = useState(false);
@@ -19,6 +15,8 @@ const Quiz = () => {
   const [score, setScore] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [list, setList] = useState([]);
+  const [questions, setQuestions] = useState([]);
+  const [apifetch, setApifetch] = useState([])
 
   useEffect(() => {
     if (timerStopReturn) {
@@ -26,28 +24,58 @@ const Quiz = () => {
     }
   }, [timerStopReturn]);
 
-const fetchQuestions = async ()=>{
-  try {
-    const responce = await axios.get('https://quizapi.io/api/v1/questions',{
-      params:{
-        apiKey: 'B3dPEvWBEXgmHI92AmfJZOGbOOzH6INfdoTGTsrO'
-      }
-    });
-    console.log(responce.data);
+// const fetchQuestions = async ()=>{
+//   try {
+//     const responce = await axios.get('https://quizapi.io/api/v1/questions',{
+//       params:{
+//         apiKey: 'B3dPEvWBEXgmHI92AmfJZOGbOOzH6INfdoTGTsrO'
+//       }
+//     });
+//     console.log(responce.data);
+//     setApifetch(responce.data)
+//   } catch (error) {
+//     console.error("error fetching quiz questions: ",error);
     
-  } catch (error) {
-    console.error("error fetching quiz questions: ",error);
-    
-  }
-}
+//   }
+// }
 
-  useEffect(() => {
-    const string = localStorage.getItem("list");
-    if (string) {
-      setList(JSON.parse(string));
+useEffect(() => {
+  const fetchQuestions = async () => {
+    try {
+      const response = await axios.get("https://quizapi.io/api/v1/questions", {
+        params: {
+          apiKey: "B3dPEvWBEXgmHI92AmfJZOGbOOzH6INfdoTGTsrO",
+        },
+      });
+
+      console.log("API Response: ", response.data); // ✅ This should now log correctly
+
+      const formattedQuestions = response.data.map((item) => {
+        const options = Object.values(item.answers).filter(
+          (option) => option !== null
+        );
+
+        const correctIndex = Object.values(item.correct_answers).findIndex(
+          (val) => val === "true"
+        );
+
+        return {
+          Question: item.question,
+          options: options,
+          ans: options[correctIndex], // Correct answer from options
+        };
+      });
+
+      console.log("Formatted Questions: ", formattedQuestions); // ✅ Now this will log correctly
+
+      setQuestions(formattedQuestions);
+    } catch (error) {
+      console.error("Error fetching quiz questions: ", error);
     }
-    fetchQuestions()
-  }, []);
+  };
+
+  fetchQuestions();
+}, []);
 
   const handleSubmit = () => {
     if (submit) {
@@ -90,8 +118,8 @@ const fetchQuestions = async ()=>{
     setSelectedOption(questions[currentIndex].options[index]);
   };
 
-  const question = questions[currentIndex];
-  const options = question.options;
+  const question = questions[currentIndex] || {};
+  const options = question.options || [];
   const totalScore = questions.length * 10;
 
   return (
@@ -101,6 +129,10 @@ const fetchQuestions = async ()=>{
       <Navbar out />
       <div className="main-cont h-[calc(100vh-60px)] w-[100vw] flex justify-center items-center">
         <div className="inn-cont h-full w-[50%] flex flex-col px-[10px] py-[20px] items-center gap-[1%] justify-center">
+        {questions.length === 0 ? (
+          <p>Loading questions...</p>
+        ) : (
+          <>
           <div className="qno font-bold uppercase text-[1.5rem] h-[6%]">{`Question No. ${
             currentIndex + 1
           }`}</div>
@@ -147,7 +179,7 @@ const fetchQuestions = async ()=>{
                 <img src="clock.gif" alt="" className="h-[100%]" />
               </div>
               <div className="count">
-                <Timer time="600" />
+                <Timer time="60" />
               </div>
             </div>
             <button
@@ -162,6 +194,8 @@ const fetchQuestions = async ()=>{
             </button>
             <div className="score">{`${score}/${totalScore}`}</div>
           </div>
+          </>
+        )}
         </div>
       </div>
     </timerReturn.Provider>
