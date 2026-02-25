@@ -5,7 +5,7 @@ import Landing from "./pages/Landing";
 import Quiz from "./pages/Quiz";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import ScoreList from "./pages/ScoreList";
+import Scorelist from "./pages/Scorelist";
 import Homepage from "./pages/Homepage";
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
         <Route path="/quiz" element={<Quiz />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/scorelist" element={<ScoreList />} />
+        <Route path="/scorelist" element={<Scorelist />} />
         <Route path="/homepage" element={<Homepage />} />
       </Routes>
     </HashRouter>
